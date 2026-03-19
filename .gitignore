@@ -1,4 +1,8 @@
 *.env
 *.csv
+<<<<<<< HEAD
 Results/
 venv.venv/
+=======
+api.venv/
+>>>>>>> 66c48d6 (updated gitignore)
