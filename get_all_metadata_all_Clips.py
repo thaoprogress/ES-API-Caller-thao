@@ -4,7 +4,7 @@ import csv
 from pathlib import Path
 import FlowAPI
 from dotenv import load_dotenv
-
+import re
 
 # --------- INIT ---------
 env_path = Path(__file__).parent / "cred.env"
@@ -15,7 +15,7 @@ metadata_api = FlowAPI.Metadata.create_gateway_instance(
 )
 
 # --------- CONFIG ---------
-csv_path = Path(__file__).parent / "result_all_metadat.csv"
+csv_path = Path(__file__).parent / "result_all_metadata_all_clipso.csv"
 #limit = metadata_api.numClips()
 limit = 500
 offset = 0
@@ -95,6 +95,10 @@ def pretty_header_name(col: str) -> str:
     return col
 
 
+def natural_sort_key(s):
+    return [int(c) if c.isdigit() else c.lower() for c in re.split(r'(\d+)', s)]
+
+
 # --------- MAIN ---------
 all_clips = metadata_api.clips(offset=offset, limit=limit)
 total_clips = len(all_clips)
@@ -102,6 +106,7 @@ total_clips = len(all_clips)
 # Custom-Feld-Definitionen holen und Mapping db_key -> Name bauen
 custom_field_definitions = metadata_api.getCustomMetadataFields()
 dbkey_to_name = {f["db_key"]: f["name"] for f in custom_field_definitions}
+
 
 # --------- PASS 1: alle Keys sammeln ---------
 all_keys = set()
@@ -132,7 +137,7 @@ for clip_counter, clip in enumerate(all_clips, start=1):
 file_exists = csv_path.exists()
 mode = "a" if file_exists else "w"
 
-fieldnames_raw = sorted(all_keys)
+fieldnames_raw = sorted(all_keys, key=natural_sort_key)
 fieldnames = [pretty_header_name(c) for c in fieldnames_raw]
 
 with open(csv_path, mode, newline="", encoding="utf-8") as f:
