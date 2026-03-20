@@ -155,8 +155,10 @@ with open(csv_path, mode, newline="", encoding="utf-8") as f:
 
         flat = flatten(clip_metadata)
 
-        # Spaltennamen sind bereits "schön", nur Werte schreiben
-        writer.writerow(remove_newline(flat))
+        # Keys umbenennen, genau wie die fieldnames
+        flat_renamed = {pretty_header_name(k): v for k, v in flat.items()}
+
+        writer.writerow(remove_newline(flat_renamed))
 
         f.flush()
         os.fsync(f.fileno())
