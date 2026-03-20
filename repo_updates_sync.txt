@@ -1,0 +1,23 @@
+Rebase Workflow = Updates vom Hauptrepo übernehmen
+
+Kontrolle:
+git remote -v 
+origin = mein Fork
+upstream = Hauptrojekt
+
+Updates holen und integrieren mit "Rebase":
+git fetch upstream
+git rebase upstream/main
+
+Konflikte aufgrund lokalen Änderungen in meinem Fork werden in VSCode angezeigt.
+Konflikte lösen in VSCode:
+Accept Current Change → meine Änderung behalten
+Accept Incoming Change → Upstream-Änderung übernehmen
+Accept Both Changes → beide kombinieren/beide Zeilen bleiben nacheinander im Code stehen
+
+git add .
+git rebase --continue
+
+meinen Fork-Branch mit Force-Push aktualisieren:
+git push origin main --force-with-lease
+
