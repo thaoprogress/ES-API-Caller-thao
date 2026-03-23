@@ -1,8 +1,11 @@
 import csv
 from pathlib import Path
 
-INPUT = "result_clean_h.csv"
-BASENAME = "result_clean_h_part_"   # ergibt z.B. grosse_datei_teil_1.csv
+RESULTS_DIR = Path("Results")
+INPUT       = RESULTS_DIR / "result_all_metadata_all_clips.csv"
+BASENAME    = RESULTS_DIR / "result_all_metadata_all_clips_part_"
+
+
 ROWS_PER_FILE = 800_000
 
 def split_csv(input_path, rows_per_file):
@@ -19,7 +22,7 @@ def split_csv(input_path, rows_per_file):
         for row in reader:
             # Neues Output-File öffnen, wenn noch keines offen ist
             if out_file is None:
-                out_name = f"{INPUT.rsplit('.', 1)[0]}_teil_{file_index}.csv"
+                out_name = RESULTS_DIR / f"{INPUT.stem}_teil_{file_index}.csv"
                 out_file = open(out_name, "w", newline="", encoding="utf-8")
                 writer = csv.writer(out_file)
                 writer.writerow(header)  # Header in jede Teil-CSV schreiben
