@@ -1,9 +1,9 @@
-Rebase Workflow = Updates vom Hauptrepo übernehmen
+Rebase Workflow = Updates vom Hauptrepository übernehmen
 
 Kontrolle:
 git remote -v 
 origin = mein Fork
-upstream = Hauptrojekt
+upstream = Hauptprojekt
 
 Updates holen und integrieren mit "Rebase":
 git fetch upstream
