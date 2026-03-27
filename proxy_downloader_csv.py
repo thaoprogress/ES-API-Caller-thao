@@ -1,10 +1,11 @@
 # --------- IMPORTS ---------
 import os
 import csv
-import re
-from pathlib import Path
+import shutil
 import FlowAPI
+from pathlib import Path
 from dotenv import load_dotenv
+
 
 # --------- INIT ---------
 env_path = Path(__file__).parent / "cred.env"
@@ -14,47 +15,45 @@ metadata_api = FlowAPI.Metadata.create_gateway_instance(
     os.environ["FLOW_USER"], os.environ["FLOW_PASSWORD"], os.environ["FLOW_HOST"]
 )
 
+
 # --------- CONFIG ---------
+proxy_server_base = Path(r"\\10.0.77.14\RAIDS\RAID_1\flow\files")
+clip_list_path = Path(__file__).parent / "AniVision_Filmliste.CSV"
 csv_path = Path(__file__).parent / "Results" / "result_all_metadata_all_clips.csv"
-download_path = 
-clip_list_path = Path(__file__).parent / "Results" / "clip_list.csv"
+download_path = Path(r"\\10.0.77.11\Ablage KI Proxy_1\wip_Lieferung AniVision 1.5Mbit")
 
 
+# --------- MAIN ---------
+TITLE_COLUMNS = [
+    "asset_custom_named.04 Title",
+    "asset_custom_named.014 Title Original",
+    "asset_custom_named.015 Title German",
+]
 
+with open(clip_list_path, newline="", encoding="utf-8") as f:
+    reader = csv.DictReader(f)
+    clip_titles = {row["Titel"].strip() for row in reader if row["Titel"]}
 
+with open(csv_path, newline="", encoding="utf-8") as f:
+    reader = csv.DictReader(f)
+    for i, row in enumerate(reader, start=2):
+        matched_title = None
+        for col in TITLE_COLUMNS:
+            if row.get(col, "").strip() in clip_titles:
+                matched_title = row[col].strip()
+                break
 
+        if not matched_title:
+            continue
 
+        proxy_path = row["proxy_path"]
+        if not proxy_path:
+            print(f"⚠️  Kein Proxy für: {matched_title} (Zeile {i})")
+            continue
 
+        source = proxy_server_base / proxy_path
+        dest_name = matched_title + source.suffix
+        destination = download_path / dest_name
 
-
-
-
-
-
-# meta = MetadataConnection.createinstance("10.0.77.14", "username", "password")
-
-# Schritt 1: Clip-Metadaten holen - proxy_path ist direkt enthalten
-all_clips   = metadata_api.clips(offset=offset, limit=limit)
-
-for clip_counter, clip in enumerate(all_clips, start=1):
-    
-    clip_metadata = metadata_api.get_clip(clip)
-
-    print(clip_metadata )
-    
-    if clip_metadata:
-        proxy_path = str(clip_metadata.get("proxy_path", {}))
-     #print(proxy_path)
-     # Ergibt z.B.: "proxy/proxy-b0/8d784326-837d-4b3a-8cc9-ee7e9628d4b0.mp4"
-
- # Schritt 2: Vollständigen UNC-Pfad zusammenbauen
-        # unc_base = r"\\10.0.77.14\RAIDS\RAID_1\flow\files"
-        # full_proxy_path = os.path.join(unc_base, proxy_path.replace("/", "\\"))
-
-        #  # Schritt 3: Datei lokal in Zielordner kopieren
-        # local_destination = r"C:\Users\Thao-Nhi Hoang\Documents\Code\ES-API-Call-proxy_path\result_test"  # <- deinen Zielpfad hier einsetzen
-        # os.makedirs(local_destination, exist_ok=True)
-        # shutil.copy(full_proxy_path, local_destination)
-
-        # print(f"Proxy kopiert: {full_proxy_path}")
-        # print(f"Ziel: {local_destination}")
+        #shutil.copy2(source, destination)
+        print(f"✅ Kopiert: {matched_title} → {dest_name}")
