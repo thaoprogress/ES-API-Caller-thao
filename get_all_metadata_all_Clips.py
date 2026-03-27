@@ -16,10 +16,10 @@ metadata_api = FlowAPI.Metadata.create_gateway_instance(
 
 
 # --------- CONFIG ---------
-tmp_path   = Path(__file__).parent / "result_tmp.csv"
-final_path = Path(__file__).parent / "result_all_metadata_all_clips.csv"
-limit  = metadata_api.numClips()
-#limit = 500
+tmp_path   = Path(__file__).parent / "test.csv"
+final_path = Path(__file__).parent / "result_test.csv"
+#limit  = metadata_api.numClips()
+limit = 100
 offset = 0
 
 
