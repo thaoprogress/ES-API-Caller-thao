@@ -4,6 +4,7 @@ import csv
 import shutil
 import FlowAPI
 import html
+import paramiko
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -68,8 +69,11 @@ with open(csv_path, newline="", encoding="utf-8") as f:
         matched_uuids.append(row["asset.uuid"])
         matched_search_titles.append(html.unescape(row.get(col, "").strip()))
 
-        shutil.copy2(source, destination)
-        print(f"✅ Kopiert: {matched_title} → {str(source)}")
+
+
+        if source.exists():
+            #shutil.copy2(source, destination)
+            print(f"✅ Kopiert: {matched_title} → {str(source)}")
 
 
 # --------- CHECK ---------
